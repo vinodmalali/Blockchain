@@ -1,0 +1,8 @@
+let El2022 = await Election2022.deployed()
+let ElComm = await ElectionCommision.deployed()
+await El2022.addCandidate("CANDIDATE_NAME",{from: accounts[1], value: web3.utils.toWei("1","ether")})
+El2022.setEC(ElComm.address)
+ElComm.approveCandidate(El2022.address,1)
+ElComm.setStart(El2022.address,1665409450)
+ElComm.setStop(El2022.address,1665409650)
+El2022.vote(1)

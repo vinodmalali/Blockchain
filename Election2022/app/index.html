@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>My First dApp</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            div {
+                width: 20%;
+                margin: 0 auto;
+                display: flex;
+                flex-direction: column;
+            }
+            button {
+                width: 100%;
+                margin: 10px 0px 5px 0px;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <h1>Election 2022</h1>
+            <p>Here we get  </p>
+            
+
+            <label for="name">Enter candidate name</label>  
+            <input type="text" id="name" placeholder="enter name"/>
+            <button onclick="addCandidate()">Add Candidate</button> <br/>
+         
+            <input type="text" id="num" placeholder="enter cid"/>
+            <button onclick="getcandidate()">Get candidaetes details</button> <br/>
+
+            <button onclick="getcandidatesCount()">condidates count</button><br/>
+
+            <input type="text" id="addr" placeholder="enter address to set EC"/>
+            <button onclick="setEC()">setEC</button><br/>
+
+            <input type="text" id="adr" placeholder="enter election address "/>
+            <input type="text" id="re" placeholder="enter id"/>
+            <button onclick="approveCandidiate()">ApproveCandidate</button><br/>
+
+            <input type="text" id="ad" placeholder="enter election address "/>
+            <input type="text" id="tr" placeholder="enter id"/>
+            <button onclick="setStart()">setStart</button><br/>
+
+            <input type="text" id="a" placeholder="enter election address "/>
+            <input type="text" id="st" placeholder="enter id"/>
+            <button onclick="setStop()">setStop</button><br/>
+
+            <label for="cid" > To Vote.....</label> 
+            <input type="text" id="cid" placeholder="enter Cid" />
+            <button onclick="vote()">vote</button>
+        </div>
+    </body>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.1/ethers.umd.js"
+        type="application/javascript"
+    ></script>
+
+    <script>
+        
+        
+        let Election2022Contract;
+        let ElectionCommisionContract
+        let signer;
+        let provider;
+        let accounts;
+        let Election2022ContractABI;
+        let Election2022ContractAddress;
+
+        let ElectionCommisionContractABI;
+        let ElectionCommisionContractAddress;
+ 
+       
+        // doInit();
+ 
+        async function getcandidatesCount() {
+            const price = await Election2022Contract.candidatesCount();
+            console.log(price.toString());
+			      alert(price.toString());
+            //document.getElementById("currentPrice").setAttribute('value',price.toString()) ;
+        }
+
+        async function getcandidate() {    
+            const val = document.getElementById("num").value;
+            console.log(await Election2022Contract.candidates(val));
+			      //alert(arr);
+           
+        }
+
+        async function addCandidate() {
+          let name = document.getElementById("name").value;
+            const amount = 1;
+            let bigAmount = ethers.BigNumber.from(amount).mul(ethers.BigNumber.from("1000000000000000000"));
+            await Election2022Contract.addCandidate(name,{value: bigAmount});
+        }
+
+       
+ 
+        async function setEC() {
+          var adr = document.getElementById("addr").value;
+          await Election2022Contract.setEC(adr);
+
+
+        }
+
+        async function approveCandidiate() {
+            var adrs = document.getElementById("adr").value;
+            const id = document.getElementById("re").value;
+            console.log(await ElectionCommisionContract.approveCandidate(adrs,id));
+        }
+
+        async function setStart() {
+              var adrs = document.getElementById("ad").value;
+              const amount = document.getElementById("tr").value;
+              console.log(await ElectionCommisionContract.setStart(adrs,amount));
+          }
+
+        async function setStop() {
+              var adrs = document.getElementById("a").value;
+              const amount = document.getElementById("st").value;
+              console.log(await ElectionCommisionContract.setStop(adrs,amount));
+          }
+
+        async function vote() {
+
+          const a = document.getElementById("cid").value;
+          await Election2022Contract.vote(a);
+
+
+        }
+
+        async function doInitMetamask() {
+            Election2022ContractAddress = "0x69f56B438768eC64C812C14be6B5259993eEF4F0";
+            ElectionCommisionContractAddress = "0x12f3daF40a09bBd1D911EFc8E820a8A89809A1Da";
+
+            Election2022ContractABI = [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_admin",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "consolePrint",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "candidates",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "approved",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "id",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "voteCount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "candidateName",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "candidatesCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "startTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [],
+      "name": "stopTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "name": "voters",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_ec",
+          "type": "address"
+        }
+      ],
+      "name": "setEC",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "_name",
+          "type": "string"
+        }
+      ],
+      "name": "addCandidate",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "num",
+          "type": "uint256"
+        }
+      ],
+      "name": "approveCandidiate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "num",
+          "type": "uint256"
+        }
+      ],
+      "name": "setStart",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "num",
+          "type": "uint256"
+        }
+      ],
+      "name": "setStop",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_candidateId",
+          "type": "uint256"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getResults",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "bool",
+              "name": "approved",
+              "type": "bool"
+            },
+            {
+              "internalType": "address",
+              "name": "id",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "voteCount",
+              "type": "uint256"
+            },
+            {
+              "internalType": "string",
+              "name": "candidateName",
+              "type": "string"
+            }
+          ],
+          "internalType": "struct Election2022.Candidate",
+          "name": "candidate",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    }
+  ]
+
+  ElectionCommisionContractABI = [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "name": "consolePrint",
+      "type": "event"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback",
+      "payable": true
+    },
+    {
+      "inputs": [],
+      "name": "admin",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function",
+      "constant": true
+    },
+    {
+      "stateMutability": "payable",
+      "type": "receive",
+      "payable": true
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "election",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "id",
+          "type": "uint256"
+        }
+      ],
+      "name": "approveCandidate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "election",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "time",
+          "type": "uint256"
+        }
+      ],
+      "name": "setStart",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "election",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "time",
+          "type": "uint256"
+        }
+      ],
+      "name": "setStop",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "election",
+          "type": "address"
+        }
+      ],
+      "name": "kill",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ]
+            provider = new ethers.providers.Web3Provider(web3.currentProvider);
+
+            // try {
+            //     await provider.send("eth_requestAccounts", []);
+            // } catch {
+            //     console.log("Connection error");
+            // }
+
+            accounts = await provider.listAccounts();
+            console.log(accounts);
+            
+            signer = await provider.getSigner(accounts[0]);
+            console.log(signer);
+
+            console.log(Election2022ContractAddress);
+            console.log(Election2022ContractABI);
+
+            
+            console.log(ElectionCommisionContractAddress);
+            console.log(ElectionCommisionContractABI);
+            
+            Election2022Contract = new ethers.Contract( Election2022ContractAddress, Election2022ContractABI, signer);
+            ElectionCommisionContract = new ethers.Contract( ElectionCommisionContractAddress, ElectionCommisionContractABI, signer);
+        }
+        doInitMetamask();
+    </script>
+</html>
