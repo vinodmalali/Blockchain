@@ -54,7 +54,11 @@
 
             <label for="cid" > To Vote.....</label> 
             <input type="text" id="cid" placeholder="enter Cid" />
-            <button onclick="vote()">vote</button>
+            <button onclick="vote()">vote</button><br/>
+
+            <button onclick="getResults()">Results</button>
+
+
         </div>
     </body>
     <script
@@ -134,6 +138,11 @@
 
 
         }
+
+        async function getResults() {
+              
+              console.log(await Election2022Contract.getResults());
+          }
 
         async function doInitMetamask() {
             Election2022ContractAddress = "0x69f56B438768eC64C812C14be6B5259993eEF4F0";
